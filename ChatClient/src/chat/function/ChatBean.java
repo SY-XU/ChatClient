@@ -5,9 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class ChatBean implements Serializable
-{
-	private static final long serialVersionUID = 2455508238609376107L;
-	
+{	
 	private int type; //  -1下线请求 0上下线更新 1私聊 2请求发送文件 3.确定接收文件
 	private HashSet<String> clients; // 存放选中的客户
 	private HashSet<String> to;
@@ -107,9 +105,6 @@ public class ChatBean implements Serializable
 	{
 		this.port = port;
 	}
-	public static long getSerialversionuid()
-	{
-		return serialVersionUID;
-	}
+	
 	
 }

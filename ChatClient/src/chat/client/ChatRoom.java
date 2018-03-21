@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -58,7 +59,10 @@ import chat.util.ChatUtil;
 
 class CellRenderer extends JLabel implements ListCellRenderer
 {
-
+	public CellRenderer()
+	{
+		setOpaque(true);
+	}
 	/* （非 Javadoc）
 	 * @see javax.swing.ListCellRenderer#getListCellRendererComponent(javax.swing.JList, java.lang.Object, int, boolean, boolean)
 	 */
@@ -85,6 +89,7 @@ class CellRenderer extends JLabel implements ListCellRenderer
 			{
 				setBackground(new Color(255, 255, 153));
 				setForeground(Color.black);
+				
 			}
 		else
 			{
@@ -99,10 +104,9 @@ class CellRenderer extends JLabel implements ListCellRenderer
 	
 }
 
-@SuppressWarnings("rawtypes")
+
 class UUListModel extends AbstractListModel
 {
-	private static final long serialVersionUID = -2222115225092586203L;
 	private Vector vs;
 
 	public UUListModel(Vector vs)
@@ -131,7 +135,7 @@ class UUListModel extends AbstractListModel
 
 public class ChatRoom extends JFrame
 {
-	private static final long serialVersionUID = -4545722006591500500L;
+
 	private static String name;
 	private static Socket clientSocket;
 	private static JPanel contentPane;
@@ -154,10 +158,10 @@ public class ChatRoom extends JFrame
 	
 	
 
-	public ChatRoom(String name,Socket clientSocket)
+	public ChatRoom(String u_name,Socket client)
 	{
-		this.name =name;
-		this.clientSocket = clientSocket;
+		name =u_name;
+		clientSocket = client;
 		onlines = new Vector();
 		
 		SwingUtilities.updateComponentTreeUI(this);
@@ -258,6 +262,7 @@ public class ChatRoom extends JFrame
 		lblNewLabel.setBounds(430, 410, 245, 15);
 		getContentPane().add(lblNewLabel);
 		
+		
 		try
 			{
 				oos = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -274,7 +279,8 @@ public class ChatRoom extends JFrame
 				//cb=file.toURL();
 				//aau = Applet.newAudioClip(cb);
 				
-				//new ClientInputThread().start();
+				// 启动客户接收线程
+				new ClientInputThread().start();
 			} catch (Exception e)
 			{
 				e.printStackTrace();
@@ -283,7 +289,6 @@ public class ChatRoom extends JFrame
 		//send button
 		btnNewButton_1.addActionListener(new ActionListener()
 		{	
-			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				String info = textArea_1.getText();
@@ -340,7 +345,6 @@ public class ChatRoom extends JFrame
 		//close button
 		btnNewButton.addActionListener(new ActionListener()
 		{		
-			@Override
 			public void actionPerformed(ActionEvent e)
 			{
 				if(isSendFile||isReceiveFile)
@@ -424,6 +428,7 @@ public class ChatRoom extends JFrame
 								clientBean.setName(name);
 								clientBean.setTimer(ChatUtil.getTimer());
 								clientBean.setFileName(file.getName());
+								clientBean.setInfo("请求发送文件");
 								
 								//send to where?
 								HashSet<String> set = new HashSet<String>();
@@ -451,8 +456,6 @@ public class ChatRoom extends JFrame
 								final ChatBean bean = (ChatBean) ois.readObject();
 								switch (bean.getType())
 								{
-								case -1:
-									return;
 								case 0://refresh list
 								{
 									onlines.clear();
@@ -478,7 +481,10 @@ public class ChatRoom extends JFrame
 									textArea.selectAll();
 									break;
 								}
-								
+								case -1:
+								{
+									return;
+								}
 								case 1:
 								{
 									String info = bean.getTimer() + "  " + bean.getName()
